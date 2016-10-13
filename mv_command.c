@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+// this command can be used to rename both files and folders present in the directory in which the code is present.
 int main ()
 {   
     char oldname[100];
