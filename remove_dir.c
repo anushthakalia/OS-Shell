@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <dirent.h>
-
+//This works only for those folders whose contents are  files
 int main()
 {
     // These are data types defined in the "dirent" header
@@ -10,7 +10,7 @@ int main()
     DIR *theFolder = opendir(str);
     struct dirent *next_file;
     char filepath[256];
-
+    getcwd(filepath, sizeof(filepath));
 
 
     while ( (next_file = readdir(theFolder)) != NULL )
