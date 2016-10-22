@@ -14,9 +14,9 @@ extern  int alphasort();
 #define FALSE 0
 #define TRUE !FALSE
 
-//int minimum_edit_distance(string alpha, string beeta);
+int minimum_edit_distance(string alpha, string beeta);
 void get_partial_match_table(string pattern_string, int pattern_len, int pmt[]);
-//string suggest_command(string input);
+void suggest_command(string input);
 void curtime();
 void remove_file(string name_file);
 void remove_dir(string dir_name);
@@ -32,25 +32,24 @@ string get_data_string(string file_name);
 vector<int> KMP_implementation(string text_string, string pattern_string);
 void change_directory(string directory);
 void grep(string text, string file_name);
-
-
 string arr[9] = {"curtime","whereami","ls","cd","refile","delfile","deldir","grep","exit"};
 char pathname[MAXPATHLEN];
 
 int main()
-{
-	
+{		
+	string command_line;		
+	int a = 1;
+	while(a == 1)
+	{
+		cout<<endl;
 		cout<<"sanjeev@sanjeev-HP-ProBook-445-G1";
 		cout<<">>";
-		string command_line;	
-		while(1)
-		{
-
 		getline(cin, command_line);
+		
 		vector<string> tokens = tokenizer(command_line);		
-
-		int command=0;
-		for(int i=0;i<8;i++)
+		suggest_command(tokens[0]);
+		int command=-1;
+		for(int i=0;i<9;i++)
 		{				
 				if(tokens[0] == arr[i])
 				{			
@@ -61,26 +60,26 @@ int main()
 
 		switch(command)	
 		{
-		case 0: curtime();
+		case 0: curtime();  //curtime
 				break;
-		case 1: get_current_directory();		
+		case 1: get_current_directory();	//whereami
 				break;
-		case 2:	ls();
+		case 2:	ls();   //ls
 				break;
-		case 3: change_directory(tokens[1]);	
+		case 3: change_directory(tokens[1]);	// cd folder	
 				break;
-		case 4: rename_file(tokens[1], tokens[2]);
+		case 4: rename_file(tokens[1], tokens[2]);	//refile oldname newname
 				break;
-		case 5: remove_file(tokens[1]);
+		case 5: remove_file(tokens[1]);		//delfile filename
 				break;
-		case 6: remove_dir(tokens[1]);
+		case 6: remove_dir(tokens[1]);		
 				break;
-		case 7: grep(tokens[1],tokens[2]);		
+		case 7: grep(tokens[1],tokens[2]);		// grep keysearch testfile.txt
 				break;
-
+		case 8: a = 9;		//exit
 		}		
-
 	}
+	cout<<"BYE"<<endl;
 }
 
 void grep(string text, string file_name)
@@ -216,8 +215,7 @@ void change_directory(string path)
 	int a;
 	string my_path = path;	
 	const char * directory = my_path.c_str();	
-    a = chdir(directory);    
-    cout<<"value of a: "<<a<<endl;
+    a = chdir(directory);        
     if (a==0) cout<<"Directory changed successful"<<endl;
     else cout<<"ERROR: No such directory found"<<endl;
 }
@@ -421,3 +419,65 @@ int min (int a, int b, int c)
 	else return c;
 }
 
+void suggest_command(string input)
+{	
+	int index, min, temp;
+	index = 0; min= 1000;
+	for(int i = 0;i<7;i++)
+	{
+		temp = minimum_edit_distance(input, arr[i]);		
+		if(min>temp) 
+		{
+			min = temp;
+			index = i;
+		}			
+	}	
+
+	if ((min <= 3)&&(min>=1)) 
+	{
+		cout<<"Do you mean '"<<arr[index]<<"'"<<endl;
+	}	
+	else if(min!=0) cout<<"NO command found"<<endl;	
+	cout<<endl;
+}
+
+int minimum_edit_distance(string alpha, string beeta)
+{
+	alpha = '#' + alpha;
+	beeta = "#" + beeta;
+	int alpha_size = alpha.size();
+	int beeta_size = beeta.size();
+	char alpha_array[alpha_size+1];
+	char beeta_array[beeta_size+1];		
+	strcpy(alpha_array, alpha.c_str());		
+	strcpy(beeta_array, beeta.c_str());		
+	int distance_table[alpha_size+1][beeta_size+1];	
+
+	for(int i = 0;i<=alpha_size;i++)
+	{
+		distance_table[i][0] = i;
+	}
+
+	for(int i = 0;i<=beeta_size;i++)
+	{
+		distance_table[0][i] = i;
+	}
+
+	for(int i = 1;i<alpha_size;i++)
+	{
+		for(int j = 1;j<beeta_size;j++)
+		{
+			if(alpha_array[i] == beeta_array[j])
+			{
+				distance_table[i][j] = min((distance_table[i-1][j]+1),(distance_table[i][j-1]+1),(distance_table[i-1][j-1]));				
+			}
+			else
+			{
+				distance_table[i][j] = min((distance_table[i-1][j]+1),(distance_table[i][j-1]+1),(distance_table[i-1][j-1]+2));					
+			}
+		}
+	}
+
+	return distance_table[alpha.size()-1][beeta.size()-1];
+	
+}
