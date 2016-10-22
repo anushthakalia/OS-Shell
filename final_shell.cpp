@@ -16,6 +16,8 @@ extern  int alphasort();
 void get_partial_match_table(string pattern_string, int pattern_len, int pmt[]);
 //string suggest_command(string input);
 void curtime();
+void ls();
+int file_select(struct dirent *entry);
 vector<string> tokenizer(string sentence);
 vector<int> get_white_spaces(string sentence);
 void get_current_directory();
@@ -56,7 +58,7 @@ int main()
 				break;
 		case 1: get_current_directory();		
 				break;
-		case 2:								 
+		case 2:	ls();
 				break;
 		case 3: change_directory(tokens[1]);	
 				break;
@@ -84,10 +86,10 @@ void get_current_directory()
 void ls()
 {
 	int count,i;
-	struct direct **files;
-	int file_select();
-	char pathname [1024];
-	if (getcwd(pathname, sizeof(pathname)) == NULL )
+	struct dirent **files;
+	int file_select(const struct dirent*);
+	char pathname[MAXPATHLEN];
+	if (getcwd(pathname, sizeof(pathname)) == NULL)
 	{				
 		cout<<"Error getting path"<<endl;		
 	}
@@ -97,17 +99,21 @@ void ls()
 	{		 
 		cout<<"No files in this directory"<<endl;		
 	}
-	for (i=1;i<count+1;++i)
+	else
 	{
+		for (i=1;i<count+1;++i)
+		{
 
-		cout<<files[i-1]->d_name<<"    ";
+			cout<<files[i-1]->d_name<<"    ";
 		
+		}
 	}
+	
 
 
 }
 
-int file_select(struct direct *entry)
+int file_select(const struct dirent *entry)
 {
 	if ((entry->d_name == ".") ||(entry->d_name == ".."))
 		return (FALSE);
