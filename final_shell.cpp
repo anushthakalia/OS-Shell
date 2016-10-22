@@ -6,6 +6,7 @@
 #include <sys/dir.h>
 #include <sys/param.h>
 #include <stdio.h>
+#include <fstream>
 
 using namespace std;
 
@@ -17,6 +18,8 @@ extern  int alphasort();
 void get_partial_match_table(string pattern_string, int pattern_len, int pmt[]);
 //string suggest_command(string input);
 void curtime();
+void remove_file(string name_file);
+void remove_dir(string dir_name);
 void ls();
 int file_select(struct dirent *entry);
 void rename_file(string oldi, string newi);
@@ -25,8 +28,10 @@ vector<int> get_white_spaces(string sentence);
 void get_current_directory();
 string strtrim(string sentence);
 vector<int> search_substring(string text_string, string pattern_string);
+string get_data_string(string file_name);
 vector<int> KMP_implementation(string text_string, string pattern_string);
 void change_directory(string directory);
+void grep(string text, string file_name);
 
 
 string arr[9] = {"curtime","whereami","ls","cd","refile","delfile","deldir","grep","exit"};
@@ -66,16 +71,74 @@ int main()
 				break;
 		case 4: rename_file(tokens[1], tokens[2]);
 				break;
-		case 5://remove_dir();
-		break;
-		case 6://grep function
-		break;
-		case 7: //exit(0);		
-		break;
+		case 5: remove_file(tokens[1]);
+				break;
+		case 6: remove_dir(tokens[1]);
+				break;
+		case 7: grep(tokens[1],tokens[2]);		
+				break;
 
-		}
+		}		
 
 	}
+}
+
+void grep(string text, string file_name)
+{
+	string data = get_data_string(file_name);
+	cout<<data;
+	vector<int> count = KMP_implementation(data, text);
+	for(int i = 0;i<count.size();i++)
+	{
+		if((i!=0)&&(count.at(i)==0)) break;
+		cout<<text<<" occurred at: "		<<count.at(i)<<endl;
+	}	
+}
+
+string get_data_string(string file_name)
+{
+	ifstream file(file_name.c_str());
+    string word;
+    char x ;
+    word.clear();
+    int count  = 0;
+    while ((x = file.get())!= EOF)
+    {
+        word = word + x;
+    }
+    file.close();
+    return word;   
+}
+
+void remove_file(string name_file)
+{
+	int ret;   
+    const char* filename = name_file.c_str();           
+    ret = remove(filename);
+    if(ret == 0) 
+    {
+     	 cout<<"File deleted successfully"<<endl;
+    }
+    else 
+    {
+    	  cout<<"Error: unable to delete the file"<<endl;
+    }
+}
+
+void remove_dir(string dir_name)
+{
+	char str[100];
+	const char* directory = dir_name.c_str();
+    DIR *theFolder = opendir(directory);
+    struct dirent *next_file;
+    char filepath[256];
+    while ( (next_file = readdir(theFolder)) != NULL )
+    {                
+        remove_file(filepath);              
+    }
+    rmdir(str);
+    //printf(" Folder deleted");
+    closedir(theFolder);
 }
 
 void rename_file(string oldi, string newi)
@@ -115,6 +178,7 @@ void ls()
 	}
 
 	count = scandir(pathname, &files, file_select, alphasort);
+
 	if (count <= 0)
 	{		 
 		cout<<"No files in this directory"<<endl;		
@@ -127,10 +191,7 @@ void ls()
 			cout<<files[i-1]->d_name<<"    ";
 		
 		}
-	}
-	
-
-
+	}	
 }
 
 int file_select(const struct dirent *entry)
@@ -222,8 +283,7 @@ vector<int> get_white_spaces(string sentence)
 			diff = j-i;
 			i = j+1;			
 		}	
-		else i++;			
-		 
+		else i++;					 
 	}
 	space_index.at(k) = sentence.size()-1;	
 	return space_index;
