@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/dir.h>
 #include <sys/param.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -18,6 +19,7 @@ void get_partial_match_table(string pattern_string, int pattern_len, int pmt[]);
 void curtime();
 void ls();
 int file_select(struct dirent *entry);
+void rename_file(string oldi, string newi);
 vector<string> tokenizer(string sentence);
 vector<int> get_white_spaces(string sentence);
 void get_current_directory();
@@ -62,8 +64,8 @@ int main()
 				break;
 		case 3: change_directory(tokens[1]);	
 				break;
-		case 4://remove_file();
-		break;
+		case 4: rename_file(tokens[1], tokens[2]);
+				break;
 		case 5://remove_dir();
 		break;
 		case 6://grep function
@@ -74,6 +76,24 @@ int main()
 		}
 
 	}
+}
+
+void rename_file(string oldi, string newi)
+{
+	const char* oldname;
+    const char* newname;
+  	oldname = oldi.c_str();
+  	newname = newi.c_str();    
+    int ret;    
+    ret = rename(oldname, newname);	
+    if(ret == 0) 
+    {
+    	cout<<"File renamed succesfully"<<endl;
+    }
+    else 
+    {
+        cout<<"Error renaming the file"<<endl;
+    }
 }
 
 void get_current_directory()
@@ -171,6 +191,7 @@ vector<string> tokenizer(string sentence)
 	}	
 	return tokens;
 }
+
 vector<int> get_white_spaces(string sentence)
 {	
 	vector<int> space_index(20);
