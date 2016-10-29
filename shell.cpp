@@ -17,16 +17,12 @@ vector<string> tokenizer(string sentence);
 int main()
 {
 	cout<<"Welcome to the new SHELL"<<endl;
-	int a = 1;			
-	vector<string> command_tokens = tokenizer("in the   arms of ocean     and tour ");	
-	cout<<"THE TOKENS ARE: "<<endl;
-	for(int x = 0;x<command_tokens.size();x++)	
-	{
-		cout<<command_tokens.at(x)<<endl;
-	}
+
+	
 	
 
 }
+
 
 
 vector<string> tokenizer(string sentence)

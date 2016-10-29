@@ -4,7 +4,7 @@
 void change_directory(char *path);
 
 int main()
-{    
+{    	
     change_directory("/home/sanjeev/Operating_System_Coding/Shell development/sanjeev");
     // function needs a string of path directory.
 }
