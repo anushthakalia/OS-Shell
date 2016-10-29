@@ -27,9 +27,9 @@ vector<string> tokenizer(string sentence);
 vector<int> get_white_spaces(string sentence);
 void get_current_directory();
 string strtrim(string sentence);
-vector<int> search_substring(string text_string, string pattern_string);
+void search_substring(string text_string, string pattern_string);
 string get_data_string(string file_name);
-vector<int> KMP_implementation(string text_string, string pattern_string);
+void KMP_implementation(string text_string, string pattern_string);
 void change_directory(string directory);
 void grep(string text, string file_name);
 string arr[9] = {"curtime","whereami","ls","cd","refile","delfile","deldir","grep","exit"};
@@ -44,10 +44,10 @@ int main()
 		cout<<endl;
 		cout<<"sanjeev@sanjeev-HP-ProBook-445-G1";
 		cout<<">>";
-		getline(cin, command_line);
-		
-		vector<string> tokens = tokenizer(command_line);		
+		getline(cin, command_line);		
+		vector<string> tokens = tokenizer(command_line);				
 		suggest_command(tokens[0]);
+
 		int command=-1;
 		for(int i=0;i<9;i++)
 		{				
@@ -85,13 +85,9 @@ int main()
 void grep(string text, string file_name)
 {
 	string data = get_data_string(file_name);
-	cout<<data;
-	vector<int> count = KMP_implementation(data, text);
-	for(int i = 0;i<count.size();i++)
-	{
-		if((i!=0)&&(count.at(i)==0)) break;
-		cout<<text<<" occurred at: "		<<count.at(i)<<endl;
-	}	
+	cout<<data<<endl;
+	vector<int> count(10);
+	KMP_implementation(data, text);	
 }
 
 string get_data_string(string file_name)
@@ -333,13 +329,12 @@ string strtrim(string sentence)
 }
 
 
-vector<int> KMP_implementation(string text_string, string pattern_string)   //This is implementation of KMP algorithm
-{	vector<int> v;
-	v = search_substring(text_string, pattern_string);
-	return v;
+void KMP_implementation(string text_string, string pattern_string)   //This is implementation of KMP algorithm
+{
+	search_substring(text_string, pattern_string);	
 }
 
-vector<int> search_substring(string text_string, string pattern_string)
+void search_substring(string text_string, string pattern_string)
 {
 	vector<int> index_vector;
 	index_vector.push_back(0);
@@ -359,9 +354,8 @@ vector<int> search_substring(string text_string, string pattern_string)
 			i = i+1;
 		}
 		if (pattern_len == j)
-		{			
-			index_vector.push_back(i-j-1);
-			index_vector.push_back(i-j+1);
+		{						
+			cout<<pattern_string<<" occurred at: "<<i-j<<endl;
 			count = count +1;
 			j = pmt[j-1];
 		}
@@ -377,7 +371,7 @@ vector<int> search_substring(string text_string, string pattern_string)
 			}
 		}
 	}
-	return index_vector;   //returns no of times a pattern is contained in it.
+	if(count ==0) cout<<"NO match found"<<endl;
 }
 
 void get_partial_match_table(string pattern_string, int pattern_len, int pmt[])
@@ -423,7 +417,9 @@ void suggest_command(string input)
 {	
 	int index, min, temp;
 	index = 0; min= 1000;
-	for(int i = 0;i<7;i++)
+	bool x;
+	x = FALSE;
+	for(int i = 0;i<9;i++)
 	{
 		temp = minimum_edit_distance(input, arr[i]);		
 		if(min>temp) 
@@ -432,12 +428,14 @@ void suggest_command(string input)
 			index = i;
 		}			
 	}	
-
+	
 	if ((min <= 3)&&(min>=1)) 
 	{
 		cout<<"Do you mean '"<<arr[index]<<"'"<<endl;
+		x = TRUE;
 	}	
-	else if(min!=0) cout<<"NO command found"<<endl;	
+	else if((min!=0)&&(!x)) cout<<"NO command found"<<endl;	
+
 	cout<<endl;
 }
 
